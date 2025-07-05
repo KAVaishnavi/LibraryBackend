@@ -5,8 +5,8 @@ const path = require('path');
 const fs = require('fs');
 const Book = require('../models/book.model');
 
-// Import only the createBook function from debug controller for testing
-const { createBook } = require('../controlers/book.controller.debug-cover');
+// Import the createBook function with REAL metadata extraction
+const { createBook } = require('../controlers/book.controller.real-metadata');
 
 // Import other functions from the original controller
 const {
@@ -102,7 +102,9 @@ const createBookValidation = [
       'Fiction', 'Non-Fiction', 'Mystery', 'Romance', 'Science Fiction', 
       'Fantasy', 'Thriller', 'Biography', 'History', 'Self-Help', 
       'Business', 'Technology', 'Health', 'Travel', 'Cooking', 
-      'Art', 'Poetry', 'Drama', 'Horror', 'Adventure', 'Classic', 'Dystopian'
+      'Art', 'Poetry', 'Drama', 'Horror', 'Adventure', 'Classic', 'Dystopian',
+      'Philosophy', 'Religion', 'Science', 'Mathematics', 'Psychology', 
+      'Sociology', 'Politics', 'Economics', 'Education', 'Reference'
     ])
     .withMessage('Please select a valid genre'),
   
@@ -177,7 +179,9 @@ const updateBookValidation = [
       'Fiction', 'Non-Fiction', 'Mystery', 'Romance', 'Science Fiction', 
       'Fantasy', 'Thriller', 'Biography', 'History', 'Self-Help', 
       'Business', 'Technology', 'Health', 'Travel', 'Cooking', 
-      'Art', 'Poetry', 'Drama', 'Horror', 'Adventure', 'Classic', 'Dystopian'
+      'Art', 'Poetry', 'Drama', 'Horror', 'Adventure', 'Classic', 'Dystopian',
+      'Philosophy', 'Religion', 'Science', 'Mathematics', 'Psychology', 
+      'Sociology', 'Politics', 'Economics', 'Education', 'Reference'
     ])
     .withMessage('Please select a valid genre'),
   
@@ -205,13 +209,13 @@ router.get('/stats', getBookStats);
 router.get('/health', (req, res) => {
   res.status(200).json({
     success: true,
-    message: 'DEBUG Book routes with PDF cover integration debugging',
+    message: 'REAL METADATA Book routes with PDF first page cover extraction',
     timestamp: new Date().toISOString(),
     features: {
-      pdfCoverPageIntegration: true,
+      realMetadataExtraction: true,
+      pdfFirstPageCover: true,
       guaranteedCoverGeneration: true,
-      enhancedFileHandling: true,
-      debugMode: true
+      noFakeData: true
     }
   });
 });
@@ -227,13 +231,13 @@ router.post('/extract-metadata',
   extractBookMetadata
 );
 
-// DEBUG: Add logging middleware for book creation
+// REAL METADATA: Add logging middleware for book creation
 router.post('/', 
   authenticateToken, 
   (req, res, next) => {
-    console.log('🚀 [ROUTE DEBUG] Book creation request received');
-    console.log('📝 [ROUTE DEBUG] Body keys:', Object.keys(req.body));
-    console.log('📁 [ROUTE DEBUG] Files:', req.files ? Object.keys(req.files) : 'No files');
+    console.log('🚀 [REAL METADATA] Book creation request received');
+    console.log('📝 [REAL METADATA] Body keys:', Object.keys(req.body));
+    console.log('📁 [REAL METADATA] Files:', req.files ? Object.keys(req.files) : 'No files');
     next();
   },
   upload.fields([
@@ -241,9 +245,9 @@ router.post('/',
     { name: 'coverImage', maxCount: 1 }
   ]), 
   (req, res, next) => {
-    console.log('📁 [ROUTE DEBUG] After multer - Files:', req.files ? Object.keys(req.files) : 'No files');
+    console.log('📁 [REAL METADATA] After multer - Files:', req.files ? Object.keys(req.files) : 'No files');
     if (req.files && req.files.bookFile) {
-      console.log('📄 [ROUTE DEBUG] Book file details:', {
+      console.log('📄 [REAL METADATA] Book file details:', {
         filename: req.files.bookFile[0].filename,
         mimetype: req.files.bookFile[0].mimetype,
         size: req.files.bookFile[0].size
@@ -267,7 +271,7 @@ router.get('/test', testEndpoint);
 router.get('/test-user-context', optionalAuth, (req, res) => {
   res.json({
     success: true,
-    message: 'DEBUG user context test with PDF cover integration',
+    message: 'REAL METADATA user context test with PDF first page cover',
     data: {
       user: req.user,
       hasUser: !!req.user,
@@ -275,10 +279,10 @@ router.get('/test-user-context', optionalAuth, (req, res) => {
       userIdType: typeof req.user?.userId,
       timestamp: new Date().toISOString(),
       features: {
-        pdfCoverPageIntegration: true,
+        realMetadataExtraction: true,
+        pdfFirstPageCover: true,
         guaranteedCoverGeneration: true,
-        enhancedFileHandling: true,
-        debugMode: true
+        noFakeData: true
       }
     }
   });
@@ -286,7 +290,7 @@ router.get('/test-user-context', optionalAuth, (req, res) => {
 
 // Error handling middleware for multer
 router.use((error, req, res, next) => {
-  console.log('❌ [ROUTE DEBUG] Error occurred:', error.message);
+  console.log('❌ [REAL METADATA] Error occurred:', error.message);
   
   if (error instanceof multer.MulterError) {
     if (error.code === 'LIMIT_FILE_SIZE') {
